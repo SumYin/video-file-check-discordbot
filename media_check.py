@@ -75,7 +75,7 @@ async def check_video(file_path):
                 videoProperties["file_framecount"] = frameCount
 
                 # frame rate
-                fps = float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0)))
+                fps = round(float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0))), 2)
                 videoProperties["file_framerate"] = fps
     
                 # codec
