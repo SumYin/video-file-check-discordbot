@@ -1,6 +1,7 @@
 import os
-from tkinter import *
-from ffprobe import FFProbe
+import subprocess
+from typing import NamedTuple
+import json
 import requests
 
 # data_format={
@@ -26,33 +27,60 @@ async def download_video(url, id):
     except Exception as e:
         return f"Error downloading video: {str(e)}"
 
+# data class for ffprobe output
+class FFProbeResult(NamedTuple):
+    return_code: int
+    json: str
+    error: str
+
+# ffprobe command
+def ffprobe(file_path) -> FFProbeResult:
+    command_array = ["ffprobe",
+    "-v", "quiet",
+    "-print_format", "json",
+    "-show_format",
+    "-show_streams",
+    file_path]
+
+    result = subprocess.run(command_array, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+
+    return FFProbeResult(return_code=result.returncode,
+                        json=result.stdout,
+                        error=result.stderr)
 
 async def check_video(file_path):
     try:
         videoProperties = {}
         
-        metadata = FFProbe(file_path).streams[0]
-
+        data = json.loads(ffprobe(file_path).json)
+        streams = data.get("streams", [])
         
+        # file name
         videoProperties["file_name"] = os.path.basename(file_path)
 
-        # frame count
-        videoProperties["file_framecount"] = int(metadata.frames())
+        for stream in streams:
+            if stream.get("codec_type") == "video":
 
-        # frame rate
-        videoProperties["file_framerate"] = videoProperties["file_framecount"] / metadata.duration_seconds()
+                # file size
+                videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
 
-        # resolution
-        videoProperties["file_resolution"] = (int(metadata.width), int(metadata.height))
+                # file type
+                videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
 
-        # codec
-        videoProperties["file_codec"] = str(metadata.codec()).lower()
+                # resolution
+                videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
 
-        # file size
-        videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
+                # frame count
+                frameCount = int(stream.get("nb_frames", 0))
+                videoProperties["file_framecount"] = frameCount
 
-        # file extension
-        videoProperties["file_type"] = str(os.path.splitext(file_path)[1]).lower().replace(".","")
+                # frame rate
+                fps = float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0)))
+                videoProperties["file_framerate"] = fps
+    
+                # codec
+                codec = str(stream.get("codec_name", "unknown"))
+                videoProperties["file_codec"] = codec
     
         return videoProperties
     
