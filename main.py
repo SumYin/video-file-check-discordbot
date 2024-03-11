@@ -29,12 +29,12 @@ async def check(interaction: nextcord.Interaction, media_link: str):
         return
 
     embed=nextcord.Embed(title=f"{returned_data["file_name"]} - Data", color=0x00ff00)
-    embed.add_field(name="File Size", value=returned_data["file_size"], inline=False)
-    embed.add_field(name="File Type", value=returned_data["file_type"], inline=False)
-    embed.add_field(name="File Resolution", value=returned_data["file_resolution"], inline=False)
-    embed.add_field(name="File Framecount", value=returned_data["file_framecount"], inline=False)
-    embed.add_field(name="File Framerate", value=returned_data["file_framerate"], inline=False)
-    embed.add_field(name="File Codec", value=returned_data["file_codec"], inline=False)
+    embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
+    embed.add_field(name="Type", value=returned_data["file_type"], inline=False)
+    embed.add_field(name="Resolution", value=returned_data["file_resolution"], inline=False)
+    embed.add_field(name="Frame Count", value=returned_data["file_framecount"], inline=False)
+    embed.add_field(name="Frame Rate", value=returned_data["file_framerate"], inline=False)
+    embed.add_field(name="Codec", value=returned_data["file_codec"], inline=False)
 
     await interaction.send(embed=embed, ephemeral=False)
 
