@@ -9,8 +9,4 @@ Requires `ffprobe.exe` to be in the same directory as the python script.
 
 ## To Do
 
-- Discord integration
-    - File upload
-    - Data output
-- Remove ffprobe-python dependency
-- Remove tkinter interface
+- Better file upload user flow
