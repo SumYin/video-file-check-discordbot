@@ -79,7 +79,7 @@ async def check_video(file_path):
 
                 # frame rate
                 try:
-                    fps = float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0)))
+                    fps = round(float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0))), 2)
                     videoProperties["file_framerate"] = fps
                 except:
                     videoProperties["file_framerate"] = "Null"
