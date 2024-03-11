@@ -2,10 +2,10 @@ import os
 import subprocess
 from typing import NamedTuple
 import json
-import requests
+import os
+import aiohttp
 
 # data_format={
-#         "file_name": str,
 #         "file_size": float,
 #         "file_type": str,
 #         "file_resolution": (int,int),
@@ -14,17 +14,21 @@ import requests
 #         "file_codec": str,
 #     }
 
-async def download_video(url, id):
+#download the video/file
+async def download_video(attached_file):
     try:
-        response = requests.get(url)
-        #remove things after the ? in the name
-        file_name = f"{id}_{os.path.basename(url).split('?')[0]}"
-        file_path = os.path.join("./videos", file_name)
-
-        with open(file_path, "wb") as file:
-            file.write(response.content)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(attached_file.url) as response:
+                file_path = os.path.join("./videos", f"{attached_file.id}_{os.path.basename(attached_file.filename).split('?')[0]}")
+                with open(file_path, "wb") as file:
+                    while True:
+                        chunk = await response.content.read(1024)
+                        if not chunk:
+                            break
+                        file.write(chunk)
         return file_path
     except Exception as e:
+        print(e)
         return f"Error downloading video: {str(e)}"
 
 # data class for ffprobe output
@@ -48,15 +52,14 @@ def ffprobe(file_path) -> FFProbeResult:
                         json=result.stdout,
                         error=result.stderr)
 
+#check/return video data
 async def check_video(file_path):
     try:
         videoProperties = {}
         
         data = json.loads(ffprobe(file_path).json)
         streams = data.get("streams", [])
-        
-        # file name
-        videoProperties["file_name"] = os.path.basename(file_path)
+
 
         for stream in streams:
             if stream.get("codec_type") == "video":
@@ -75,8 +78,11 @@ async def check_video(file_path):
                 videoProperties["file_framecount"] = frameCount
 
                 # frame rate
-                fps = float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0)))
-                videoProperties["file_framerate"] = fps
+                try:
+                    fps = float(int(stream.get("nb_frames", 0)) / float(stream.get("duration", 0)))
+                    videoProperties["file_framerate"] = fps
+                except:
+                    videoProperties["file_framerate"] = "Null"
     
                 # codec
                 codec = str(stream.get("codec_name", "unknown"))
@@ -85,4 +91,5 @@ async def check_video(file_path):
         return videoProperties
     
     except Exception as e:
-        return f"Error processing video: {str(e)}", ""
+        print(e)
+        raise e
