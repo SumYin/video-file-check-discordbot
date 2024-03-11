@@ -10,3 +10,4 @@ Requires `ffprobe.exe` to be in the same directory as the python script.
 ## To Do
 
 - Better file upload user flow
+- Delete file after analysis
