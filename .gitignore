@@ -1,0 +1,4 @@
+.env
+ffprobe.exe
+videos
+__pycache__
