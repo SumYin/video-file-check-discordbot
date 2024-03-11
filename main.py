@@ -18,9 +18,7 @@ async def ping(interaction: nextcord.Interaction):
 @bot.slash_command(description="check media file data")
 async def check(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
     file_path=await download_video(attached_file)
-    
     returned_data = await check_video(file_path)
-
 
     embed=nextcord.Embed(title=f"{attached_file.filename}", color=0x00ff00)
     embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)

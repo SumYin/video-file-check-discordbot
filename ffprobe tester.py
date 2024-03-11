@@ -2,24 +2,13 @@ import os
 import subprocess
 from typing import NamedTuple
 import json
-import aiohttp
 
-# file download
-async def download_video(attached_file):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(attached_file.url) as response:
-                file_path = os.path.join("./videos", f"{attached_file.id}_{os.path.basename(attached_file.filename).split('?')[0]}")
-                with open(file_path, "wb") as file:
-                    while True:
-                        chunk = await response.content.read(1024)
-                        if not chunk:
-                            break
-                        file.write(chunk)
-        return file_path
-    except Exception as e:
-        print(e)
-        return f"Error downloading video: {str(e)}"
+from tkinter import *
+from tkinter.filedialog import askopenfilename
+
+def browse_file():
+    file_path = askopenfilename()
+    print(check_video(file_path))
 
 # data class for ffprobe output
 class FFProbeResult(NamedTuple):
@@ -44,7 +33,7 @@ def ffprobe(file_path) -> FFProbeResult:
                         error=result.stderr)
 
 #check/return video data
-async def check_video(file_path):
+def check_video(file_path):
     try:
         videoProperties = {}
         
@@ -72,14 +61,27 @@ async def check_video(file_path):
                     fps = round(float(int(stream.get("nb_read_frames", 0)) / float(stream.get("duration", 0))), 2)
                     videoProperties["file_framerate"] = fps
                 except:
-                    videoProperties["file_framerate"] = "Null"
+                    videoProperties["file_framerate"] = "null"
     
                 # codec (string)
                 codec = str(stream.get("codec_name", "unknown"))
                 videoProperties["file_codec"] = codec
     
+        # debug
+        videoProperties["raw"] = streams
+
         return videoProperties
     
     except Exception as e:
         print(e)
         raise e
+
+root = Tk()
+root.title("Video Validator")
+root.geometry('150x100')
+root.resizable(False, False)
+
+browseButton = Button(root, width=10, text = "Browse...", command=browse_file)
+browseButton.grid(column=1, row=1, padx=(30,30), pady=(30,30))
+
+root.mainloop()
