@@ -5,7 +5,7 @@ import asyncio
 
 async def browse_file():
     file_path = askopenfilename()
-    print(await check_video(file_path,True))
+    print(await check_video(file_path))
 
 root = Tk()
 root.title("Video Validator")

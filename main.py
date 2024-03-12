@@ -43,7 +43,7 @@ async def check(interaction: nextcord.Interaction, attached_file:nextcord.Attach
         await interaction.send(embed=embed, ephemeral=False)
     
     except Exception as e:
-        print(f"Couldn't analyze file: {str(e)}")
-        return await interaction.send("Couldn't analyze file.", ephemeral=True)
+        print(f"Couldn't analyze video: {str(e)}")
+        return await interaction.send("Couldn't analyze video.", ephemeral=True)
 
 bot.run(os.getenv("TOKEN"))
