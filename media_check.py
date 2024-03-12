@@ -43,6 +43,7 @@ def ffprobe(file_path) -> FFProbeResult:
 async def check_video(file_path):
     videoProperties = {}
     
+    print(file_path)
     data = json.loads(ffprobe(file_path).json)
     streams = data.get("streams", [])
 
