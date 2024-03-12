@@ -90,7 +90,8 @@ async def check_video(file_path, debug=False):
                 if len(videoProperties) == 0: # dictionary is empty
                     videoProperties["error"] = "Couldn't analyze file."
         
-    except:
+    except Exception as e:
         videoProperties["error"] = "Couldn't analyze file."
+        print(f"Couldn't analyze file: {str(e)} ")
 
     return videoProperties
