@@ -39,54 +39,58 @@ def ffprobe(file_path) -> FFProbeResult:
                         json=result.stdout,
                         error=result.stderr)
 
-#check/return video data
+# analyze video data
 async def check_video(file_path, debug=False):
     videoProperties = {}
     
     videoProperties["file_path"] = file_path
-    
-    data = json.loads(ffprobe(file_path).json)
-    streams = data.get("streams", [])
 
-    for stream in streams:
-        if stream.get("codec_type") == "video":
+    try:
+        data = json.loads(ffprobe(file_path).json)
+        streams = data.get("streams", [])
 
-            # file size (float)
-            videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
+        for stream in streams:
+            if stream.get("codec_type") == "video":
 
-            # file type (string)
-            videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
+                # file size (float)
+                videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
 
-            # resolution (int, int)
-            videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
+                # file type (string)
+                videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
 
-            # frame count (int)
-            frameCount = int(stream.get("nb_read_frames", 0))
-            videoProperties["file_framecount"] = frameCount
+                # resolution (int, int)
+                videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
 
-            # frame rate (float)
-            if 'duration' in stream: #duration not always present
-                if frameCount == 0 or float(stream.get("duration")) == 0:
-                    fps = 0
+                # frame count (int)
+                frameCount = int(stream.get("nb_read_frames", 0))
+                videoProperties["file_framecount"] = frameCount
+
+                # frame rate (float)
+                if 'duration' in stream: #duration not always present
+                    if frameCount == 0 or float(stream.get("duration")) == 0:
+                        fps = 0
+                    else:
+                        fps = round(float(frameCount / float(stream.get("duration", 0))), 2)
+                elif stream.get("avg_frame_rate"):
+                    fps = stream.get("avg_frame_rate").split("/")[0]
                 else:
-                    fps = round(float(frameCount / float(stream.get("duration", 0))), 2)
-            elif stream.get("avg_frame_rate"):
-                fps = stream.get("avg_frame_rate").split("/")[0]
-            else:
-                fps = "undefined"
+                    fps = "undefined"
 
-            videoProperties["file_framerate"] = fps
+                videoProperties["file_framerate"] = fps
 
-            # codec (string)
-            codec = str(stream.get("codec_name", "unknown"))
-            videoProperties["file_codec"] = codec
+                # codec (string)
+                codec = str(stream.get("codec_name", "unknown"))
+                videoProperties["file_codec"] = codec
 
-    # debug
-    if debug == True:
-        videoProperties["raw"] = streams
-    
-    # error
-    if len(videoProperties) == 0: # dictionary is empty
+                # debug
+                if debug == True:
+                    videoProperties["raw"] = streams
+            
+                # error
+                if len(videoProperties) == 0: # dictionary is empty
+                    videoProperties["error"] = "Couldn't analyze file."
+        
+    except:
         videoProperties["error"] = "Couldn't analyze file."
 
     return videoProperties
