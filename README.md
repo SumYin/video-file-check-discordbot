@@ -9,5 +9,7 @@ Requires `ffprobe.exe` to be in the same directory as the python script.
 
 ## To Do
 
-- [x] Better file upload user flow
 - [ ] Delete file after analysis
+- [ ] Make frame rate and frame count analysis more consistent
+- [ ] Add URL file path as alternative to file upload
+- [ ] Test on more files
