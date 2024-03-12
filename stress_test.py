@@ -17,7 +17,15 @@ for filename in os.listdir(directory):
 async def run_check_video():
     for file_location in file_locations:
         data = await check_video(file_location)
-        print(data)
+        print(data.get("file_path"))
+        print(data.get("file_size"))
+        print(data.get("file_type"))
+        print(data.get("file_resolution"))
+        print(data.get("file_framecount"))
+        print(data.get("file_framerate"))
+        print(data.get("file_codec"))
+        print(data.get("error"))
+        print("\n")
 
 # Run the async function
 asyncio.run(run_check_video())

@@ -43,7 +43,8 @@ def ffprobe(file_path) -> FFProbeResult:
 async def check_video(file_path, debug=False):
     videoProperties = {}
     
-    print(file_path)
+    videoProperties["file_path"] = file_path
+    
     data = json.loads(ffprobe(file_path).json)
     streams = data.get("streams", [])
 
@@ -64,11 +65,17 @@ async def check_video(file_path, debug=False):
             videoProperties["file_framecount"] = frameCount
 
             # frame rate (float)
-            try:
-                fps = round(float(int(stream.get("nb_read_frames", 0)) / float(stream.get("duration", 0))), 2)
-                videoProperties["file_framerate"] = fps
-            except:
-                videoProperties["file_framerate"] = "Null"
+            if 'duration' in stream: #duration not always present
+                if frameCount == 0 or float(stream.get("duration")) == 0:
+                    fps = 0
+                else:
+                    fps = round(float(frameCount / float(stream.get("duration", 0))), 2)
+            elif stream.get("avg_frame_rate"):
+                fps = stream.get("avg_frame_rate").split("/")[0]
+            else:
+                fps = "undefined"
+
+            videoProperties["file_framerate"] = fps
 
             # codec (string)
             codec = str(stream.get("codec_name", "unknown"))
@@ -77,5 +84,9 @@ async def check_video(file_path, debug=False):
     # debug
     if debug == True:
         videoProperties["raw"] = streams
+    
+    # error
+    if len(videoProperties) == 0: # dictionary is empty
+        videoProperties["error"] = "Couldn't analyze file."
 
     return videoProperties
