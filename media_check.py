@@ -40,7 +40,7 @@ def ffprobe(file_path) -> FFProbeResult:
                         error=result.stderr)
 
 #check/return video data
-async def check_video(file_path):
+async def check_video(file_path, debug=False):
     videoProperties = {}
     
     print(file_path)
@@ -73,5 +73,9 @@ async def check_video(file_path):
             # codec (string)
             codec = str(stream.get("codec_name", "unknown"))
             videoProperties["file_codec"] = codec
+
+    # debug
+    if debug == True:
+        videoProperties["raw"] = streams
 
     return videoProperties
