@@ -3,9 +3,10 @@ import subprocess
 from typing import NamedTuple
 import json
 import aiohttp
+import requests
 
-# file download
-async def download_video(attached_file):
+# attachment download
+async def download_attachment(attached_file):
     async with aiohttp.ClientSession() as session:
         async with session.get(attached_file.url) as response:
             file_path = os.path.join("./videos", f"{attached_file.id}_{os.path.basename(attached_file.filename).split('?')[0]}")
@@ -16,6 +17,21 @@ async def download_video(attached_file):
                         break
                     file.write(chunk)
     return file_path
+
+# link download
+async def download_link(linked_file):
+    try:
+        response = requests.get(url)
+        file_name = f"{id}_{os.path.basename(url).split('?')[0]}"
+        file_path = os.path.join("./videos", file_name)
+
+        with open(file_path, "wb") as file:
+            file.write(response.content)
+        return file_path
+
+    except Exception as e:
+        print(f"Error downloading video: {str(e)}")
+        return f"Error downloading video: {str(e)}"
 
 # data class for ffprobe output
 class FFProbeResult(NamedTuple):
@@ -28,7 +44,6 @@ def ffprobe(file_path) -> FFProbeResult:
     command_array = ["ffprobe",
     "-v", "quiet",
     "-print_format", "json",
-    "-show_format",
     "-show_streams",
     "-select_streams", "v:0",
     "-count_frames",
@@ -66,7 +81,8 @@ async def check_video(file_path):
         videoProperties["file_framecount"] = frameCount
 
         # frame rate (float)
-        fps = round(float(stream.get("r_frame_rate", 0).split("/")[0]) / float(stream.get("r_frame_rate", 0).split("/")[1]), 2)
+        #fps = round(float(stream.get("r_frame_rate", 0).split("/")[0]) / float(stream.get("r_frame_rate", 0).split("/")[1]), 2)
+        fps = round(float(stream.get("avg_frame_rate", 0).split("/")[0]) / float(stream.get("avg_frame_rate", 0).split("/")[1]), 2)
         videoProperties["file_framerate"] = fps
 
         # codec (string)

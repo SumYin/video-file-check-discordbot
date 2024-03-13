@@ -11,26 +11,44 @@ bot = commands.Bot(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
+# ping
 @bot.slash_command(description="ping command")
 async def ping(interaction: nextcord.Interaction):
     await interaction.send("Pong!")
 
-@bot.slash_command(description="check media file data")
-async def check(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
-    # download the video
+# info
+@bot.slash_command(description="info command")
+async def info(interaction: nextcord.Interaction):
+    await interaction.send("Bot Source Code: https://github.com/SumYin/video-file-check-discordbot")
+
+# attachment command
+@bot.slash_command(description="check attached file data")
+async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
     try:
-        
         file_path=await download_video(attached_file)
     
     except Exception as e:
         print(f"Error downloading video: {str(e)}")
         return await interaction.send("Error downloading video", ephemeral=True)
     
-    # analyze video
+    produce_embed(file_path)
+
+# link commmand
+@bot.slash_command(description="check link file data")
+async def check_link(interaction: nextcord.Interaction, media_link: str):
+    try:
+        file_path=await download_link(media_link, interaction.user.id)
+    except Exception as e:
+        print(f"Couldn't download video: {str(e)}")
+        return await interaction.send("Couldn't download video.", ephemeral=True)
+    
+    produce_embed(file_path)
+
+# analyze file and output data
+async def produce_embed(file_path):
     try:
         returned_data = await check_video(file_path)
         
-        # output
         embed=nextcord.Embed(title=f"{attached_file.filename}", color=0x00ff00)
         embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
         embed.add_field(name="Type", value=returned_data["file_type"], inline=False)

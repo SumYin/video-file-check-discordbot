@@ -37,7 +37,7 @@ def print_data(data):
     print(data.get("file_framerate"))
     print(data.get("file_codec"))
     print(data.get("error"))
-    #print(data.get("raw"))
+    print(data.get("raw"))
 
 # window
 root = Tk()
