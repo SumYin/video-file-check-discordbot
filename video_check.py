@@ -29,7 +29,7 @@ async def download_link(linked_file, id):
             file.write(response.content)
         return file_path
 
-    except Exception as e: # can occur due to any network issues
+    except Exception as e: # can occur due to network or server connectivity issues
         print(f"Error downloading video: {str(e)}")
         return f"Error downloading video: {str(e)}"
 
@@ -59,7 +59,7 @@ async def check_video(file_path):
     # path (string)
     videoProperties["file_path"] = file_path
 
-    # data (string)
+    # raw data (string)
     rawData = ffprobe(file_path).json
     videoProperties["raw"] = rawData
 

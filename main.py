@@ -7,7 +7,7 @@ from video_check import *
 
 load_dotenv()
 
-# discord Bot
+# discord bot
 intents = nextcord.Intents.default()
 bot = commands.Bot(intents=intents)
 
@@ -15,12 +15,12 @@ bot = commands.Bot(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
-# ping
+# ping command
 @bot.slash_command(description="ping command")
 async def ping(interaction: nextcord.Interaction):
     await interaction.send("Pong!", ephemeral=True)
 
-# info
+# info command
 @bot.slash_command(description="info command")
 async def info(interaction: nextcord.Interaction):
     await interaction.send("Bot Source Code: https://github.com/SumYin/video-file-check-discordbot", ephemeral=True)

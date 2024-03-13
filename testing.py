@@ -1,17 +1,15 @@
-from video_check import *
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 import asyncio
 
-# iterate through the files in the directory
+from video_check import *
+
+# get all test files
 directory = './test-data'
 file_paths = []
 
 for filename in os.listdir(directory):
-    # get the full file path
     file_path = os.path.join(directory, filename)
-    
-    # add the file path to the list
     file_paths.append(file_path)
 
 # local file browsing
@@ -26,7 +24,6 @@ async def batch_check():
         data = await check_video(file_path)
         print_data(data)
 
-# print 
 def print_data(data):
     print("\n")
     print(data.get("file_path"))
