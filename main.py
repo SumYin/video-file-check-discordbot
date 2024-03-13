@@ -3,10 +3,15 @@ import nextcord
 from nextcord.ext import commands
 from dotenv import load_dotenv
 from datetime import datetime
+import json
 
 from video_check import *
 
 load_dotenv()
+
+# get user data
+f = open('user.json')
+user = json.load(f)
 
 # discord bot
 intents = nextcord.Intents.default()
@@ -17,14 +22,30 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
 
 # ping command
-@bot.slash_command(description="ping command")
+@bot.slash_command(description="test ping")
 async def ping(interaction: nextcord.Interaction):
     await interaction.send("Pong!", ephemeral=True)
 
 # info command
-@bot.slash_command(description="info command")
+@bot.slash_command(description="get information about this bot")
 async def info(interaction: nextcord.Interaction):
     await interaction.send("Bot Source Code: https://github.com/SumYin/video-file-check-discordbot", ephemeral=True)
+
+# rules command
+@bot.slash_command(description="check rules")
+async def rules(interaction: nextcord.Interaction):
+    embed=nextcord.Embed(title=":scroll: __Rules__ | __read carefully__ :scroll:", color=0x000000, description="")
+    for rule in user.get("rules"):
+        embed.description += rule + "\n"
+    await interaction.send(embed=embed, ephemeral=True)
+
+# faq command
+@bot.slash_command(description="check frequently asked questions")
+async def faq(interaction: nextcord.Interaction):
+    embed=nextcord.Embed(title=":grey_question: __Frequently Asked Questions__ :grey_question:", color=0x00000)
+    for faq in user.get("faq"):
+        embed.add_field(name=faq.get("Q"), value=faq.get("A"), inline=False)
+    await interaction.send(embed=embed, ephemeral=True)
 
 # attachment command
 @bot.slash_command(description="check attached file data")
@@ -46,12 +67,47 @@ async def produce_embed(file_path, interaction, file_name):
         returned_data = await check_video(file_path)
         
         embed=nextcord.Embed(title=file_name, color=0x000000, timestamp=datetime.now())
-        embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
-        embed.add_field(name="Type", value=returned_data["file_type"], inline=False)
-        embed.add_field(name="Resolution", value=returned_data["file_resolution"], inline=False)
-        embed.add_field(name="Frame Count", value=returned_data["file_framecount"], inline=False)
-        embed.add_field(name="Frame Rate", value=returned_data["file_framerate"], inline=False)
-        embed.add_field(name="Codec", value=returned_data["file_codec"], inline=False)
+
+        valid = " :white_check_mark:"
+        invalid = " :x:"
+        check = ""
+
+        # size
+        check = invalid
+        for prop in user.get("targets").get("size"):
+            if returned_data["file_size"] < prop: check = valid
+        embed.add_field(name="Size (MB)", value=str(returned_data["file_size"]) + check, inline=False)
+
+        # type
+        check = invalid
+        for prop in user.get("targets").get("type"):
+            if returned_data["file_type"] == prop: check = valid
+        embed.add_field(name="Type", value=str(returned_data["file_type"]) + check, inline=False)
+
+        # resolution
+        check = invalid
+        for prop in user.get("targets").get("resolution"):
+            if returned_data["file_resolution"] == prop: check = valid
+        embed.add_field(name="Resolution", value=str(returned_data["file_resolution"]) + check, inline=False)
+
+        # frame count
+        check = invalid
+        for prop in user.get("targets").get("framecount"):
+            if returned_data["file_framecount"] == prop: check = valid
+        embed.add_field(name="Frame Count", value=str(returned_data["file_framecount"]) + check, inline=False)
+
+        # frame rate
+        check = invalid
+        for prop in user.get("targets").get("framerate"):
+            if returned_data["file_framerate"] == prop: check = valid
+        embed.add_field(name="Frame Rate", value=str(returned_data["file_framerate"]) + check, inline=False)
+
+        # codec
+        check = invalid
+        for prop in user.get("targets").get("codec"):
+            if returned_data["file_codec"] == prop: check = valid
+        embed.add_field(name="Codec", value=str(returned_data["file_codec"]) + check, inline=False)
+
         embed.set_footer(text=interaction.user.name, icon_url=interaction.user.avatar.url)
         await interaction.followup.send(embed=embed)
 

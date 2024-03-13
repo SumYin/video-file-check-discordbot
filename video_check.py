@@ -74,7 +74,7 @@ async def check_video(file_path):
         stream = data.get("streams")[0]
 
         # resolution
-        videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + ", " + str(stream.get("height", "unknown height"))
+        videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + "x" + str(stream.get("height", "unknown height"))
 
         # frame count
         frameCount = str(stream.get("nb_read_frames", "unknown"))
