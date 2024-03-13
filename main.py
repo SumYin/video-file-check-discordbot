@@ -2,7 +2,7 @@ import os
 
 import nextcord
 from nextcord import Interaction
-from nextcord.ext import commands, application_checks
+from nextcord.ext import commands
 import cooldowns
 from cooldowns import CallableOnCooldown
 
