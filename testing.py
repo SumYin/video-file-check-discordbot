@@ -28,6 +28,7 @@ async def batch_check():
 
 # print 
 def print_data(data):
+    print("\n")
     print(data.get("file_path"))
     print(data.get("file_size"))
     print(data.get("file_type"))
@@ -37,7 +38,6 @@ def print_data(data):
     print(data.get("file_codec"))
     print(data.get("error"))
     #print(data.get("raw"))
-    print("\n")
 
 # window
 root = Tk()
