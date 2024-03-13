@@ -10,8 +10,3 @@ A bot to validate and check video file specifications for Discord communities.
 4. Create `./videos` folder in root directory.
 5. To run application, place discord bot token in `.env` file.
 6. For testing of different media, create `./test-data` folder in root directory and place test media in it.
-
-## To Do
-
-- [ ] Make frame rate and frame count analysis more consistent
-- [ ] Make prettier
