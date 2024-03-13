@@ -1,5 +1,7 @@
 .env
+.vscode
 ffprobe.exe
 \videos
 __pycache__
 \test-data
+\hidden

@@ -1,6 +1,11 @@
 import os
+
 import nextcord
-from nextcord.ext import commands
+from nextcord import Interaction
+from nextcord.ext import commands, application_checks
+import cooldowns
+from cooldowns import CallableOnCooldown
+
 from dotenv import load_dotenv
 from datetime import datetime
 import json
@@ -21,8 +26,22 @@ bot = commands.Bot(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
-# ping command
+@bot.event
+async def on_application_command_error(interactions: Interaction, error):
+    error = getattr(error, "original", error)
+    if isinstance(error, CallableOnCooldown):
+        embed=nextcord.Embed(title="Cooldown", description=(f"You are being rate-limited! Retry in `{error.retry_after}` seconds."), color=0xff0000)
+        await interactions.send(embed=embed, ephemeral=True)
+
+    elif isinstance(error, PermissionError):
+        await interactions.send(
+            f"PermissionError"
+        )
+    else:
+        pass
+
 @bot.slash_command(description="test ping")
+@cooldowns.cooldown(user["cooldown_times"]["short"][0], user["cooldown_times"]["short"][1], bucket=cooldowns.SlashBucket.author)
 async def ping(interaction: nextcord.Interaction):
     await interaction.send("Pong!", ephemeral=True)
 
@@ -49,6 +68,7 @@ async def faq(interaction: nextcord.Interaction):
 
 # attachment command
 @bot.slash_command(description="check attached file data")
+@cooldowns.cooldown(user["cooldown_times"]["long"][0], user["cooldown_times"]["long"][1], bucket=cooldowns.SlashBucket.author)
 async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
     await interaction.response.defer(ephemeral=True) # we need to decide if ephemeral when we defer, we can't affect this later
     file_path=await download_attachment(attached_file)
@@ -56,6 +76,7 @@ async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.A
     
 # link commmand
 @bot.slash_command(description="check link file data")
+@cooldowns.cooldown(user["cooldown_times"]["long"][0], user["cooldown_times"]["long"][1], bucket=cooldowns.SlashBucket.author)
 async def check_link(interaction: nextcord.Interaction, file_link: str):
     await interaction.response.defer(ephemeral=True) # we need to decide if ephemeral when we defer, we can't affect this later
     file_path=await download_link(file_link, interaction.user.id)

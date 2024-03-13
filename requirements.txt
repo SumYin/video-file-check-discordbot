@@ -1,3 +1,4 @@
-nextcord==2.6.0
+nextcord
+function-cooldowns
 aiohttp
 dotenv

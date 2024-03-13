@@ -23,5 +23,15 @@
         "framecount": [120],
         "framerate": [24],
         "codec": ["h264", "h265"]
+    },
+
+    "cooldown_bypass_users": [
+        "187049690196475904", 
+        "686253025970356309"
+    ],
+
+    "cooldown_times":{
+        "short": [1,5],
+        "long": [1,20]
     }
 }
