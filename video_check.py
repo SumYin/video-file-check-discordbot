@@ -55,7 +55,7 @@ def ffprobe(file_path) -> FFProbeResult:
 # analyze video data
 async def check_video(file_path):
     videoProperties = {}
-    
+
     # path (string)
     videoProperties["file_path"] = file_path
 
@@ -77,7 +77,7 @@ async def check_video(file_path):
         videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
 
         # frame count (int)
-        frameCount = int(stream.get("nb_read_frames", 0)) + int(stream.get("has_b_frames", 0))
+        frameCount = int(stream.get("nb_read_frames", 0))
         videoProperties["file_framecount"] = frameCount
 
         # frame rate (float)
