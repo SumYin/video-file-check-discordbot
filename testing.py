@@ -4,7 +4,7 @@ from tkinter.filedialog import askopenfilename
 import asyncio
 
 # iterate through the files in the directory
-directory = './media-refs_heads_main-test-data'
+directory = './test-data'
 file_paths = []
 
 for filename in os.listdir(directory):

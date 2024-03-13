@@ -60,7 +60,7 @@ async def check_video(file_path):
     videoProperties["file_path"] = file_path
 
     # name (string)
-    name = file_path.split("/")[-1]
+    name = file_path.split("/")[-1].split("_", 1)[1]
     videoProperties["file_name"] = name
 
     # data (string)

@@ -1,2 +1,4 @@
 nextcord==2.6.0
 aiohttp
+dotenv
+aiohttp
