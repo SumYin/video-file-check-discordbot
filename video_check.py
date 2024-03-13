@@ -35,10 +35,7 @@ def ffprobe(file_path) -> FFProbeResult:
     file_path]
 
     result = subprocess.run(command_array, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-
-    return FFProbeResult(return_code=result.returncode,
-                        json=result.stdout,
-                        error=result.stderr)
+    return FFProbeResult(return_code=result.returncode, json=result.stdout, error=result.stderr)
 
 # analyze video data
 async def check_video(file_path):
@@ -65,20 +62,11 @@ async def check_video(file_path):
         videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
 
         # frame count (int)
-        frameCount = int(stream.get("nb_read_frames", 0))
+        frameCount = int(stream.get("nb_read_frames", 0)) + int(stream.get("has_b_frames", 0))
         videoProperties["file_framecount"] = frameCount
 
         # frame rate (float)
-        if 'duration' in stream: #duration not always present
-            if frameCount == 0 or float(stream.get("duration")) == 0:
-                fps = 0
-            else:
-                fps = round(float(frameCount / float(stream.get("duration", 0))), 2)
-        elif stream.get("avg_frame_rate"):
-            fps = stream.get("avg_frame_rate").split("/")[0]
-        else:
-            fps = "undefined"
-
+        fps = round(float(stream.get("r_frame_rate", 0).split("/")[0]) / float(stream.get("r_frame_rate", 0).split("/")[1]), 2)
         videoProperties["file_framerate"] = fps
 
         # codec (string)
