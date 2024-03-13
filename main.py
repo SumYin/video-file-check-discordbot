@@ -2,6 +2,7 @@ import os
 import nextcord
 from nextcord.ext import commands
 from dotenv import load_dotenv
+from datetime import datetime
 
 from video_check import *
 
@@ -28,14 +29,14 @@ async def info(interaction: nextcord.Interaction):
 # attachment command
 @bot.slash_command(description="check attached file data")
 async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=True) # we need to decide if ephemeral when we defer, we can't affect this later
     file_path=await download_attachment(attached_file)
     await produce_embed(file_path, interaction, attached_file.filename)
     
 # link commmand
 @bot.slash_command(description="check link file data")
 async def check_link(interaction: nextcord.Interaction, file_link: str):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=True) # we need to decide if ephemeral when we defer, we can't affect this later
     file_path=await download_link(file_link, interaction.user.id)
     await produce_embed(file_path, interaction, file_link.split("/")[-1])
 
@@ -44,7 +45,7 @@ async def produce_embed(file_path, interaction, file_name):
     try:
         returned_data = await check_video(file_path)
         
-        embed=nextcord.Embed(title=file_name, color=0x00ff00)
+        embed=nextcord.Embed(title=file_name, color=0x000000, timestamp=datetime.now())
         embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
         embed.add_field(name="Type", value=returned_data["file_type"], inline=False)
         embed.add_field(name="Resolution", value=returned_data["file_resolution"], inline=False)

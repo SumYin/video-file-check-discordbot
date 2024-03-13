@@ -56,35 +56,37 @@ def ffprobe(file_path) -> FFProbeResult:
 async def check_video(file_path):
     videoProperties = {}
 
-    # path (string)
+    # path
     videoProperties["file_path"] = file_path
 
-    # raw data (string)
+    # raw data
     rawData = ffprobe(file_path).json
     videoProperties["raw"] = rawData
 
-    # size (float)
+    # size
     videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
 
-    # type (string)
+    # type
     videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
 
     try:
         data = json.loads(rawData)
         stream = data.get("streams")[0]
 
-        # resolution (int, int)
-        videoProperties["file_resolution"] = (int(stream.get("width", 0)), int(stream.get("height", 0)))
+        # resolution
+        videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + ", " + str(stream.get("height", "unknown height"))
 
-        # frame count (int)
-        frameCount = int(stream.get("nb_read_frames", 0))
+        # frame count
+        frameCount = str(stream.get("nb_read_frames", "unknown"))
         videoProperties["file_framecount"] = frameCount
 
-        # frame rate (float)
+        # frame rate
         fps = round(float(stream.get("avg_frame_rate", 0).split("/")[0]) / float(stream.get("avg_frame_rate", 0).split("/")[1]), 2)
+        if fps == 0:
+            fps = "unknown"
         videoProperties["file_framerate"] = fps
 
-        # codec (string)
+        # codec
         codec = str(stream.get("codec_name", "unknown"))
         videoProperties["file_codec"] = codec
         
