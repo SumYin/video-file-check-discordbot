@@ -1,7 +1,10 @@
 import nextcord
 from nextcord.ext import commands
 import os
-from media_check import *
+from video_check import *
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # discord Bot
 intents = nextcord.Intents.default()
@@ -25,43 +28,46 @@ async def info(interaction: nextcord.Interaction):
 @bot.slash_command(description="check attached file data")
 async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
     try:
-        file_path=await download_video(attached_file)
+        await interaction.response.defer(ephemeral=True )
+        file_path=await download_attachment(attached_file)
+        await produce_embed(file_path, interaction)
     
     except Exception as e:
         print(f"Error downloading video: {str(e)}")
-        return await interaction.send("Error downloading video", ephemeral=True)
+        return await interaction.followup.send("Couldn't download video.", ephemeral=True)
     
-    produce_embed(file_path)
-
 # link commmand
 @bot.slash_command(description="check link file data")
-async def check_link(interaction: nextcord.Interaction, media_link: str):
+async def check_link(interaction: nextcord.Interaction, file_link: str):
     try:
-        file_path=await download_link(media_link, interaction.user.id)
+        await interaction.response.defer(ephemeral=True )
+        file_path=await download_link(file_link, interaction.user.id)
+        await produce_embed(file_path, interaction)
+
     except Exception as e:
-        print(f"Couldn't download video: {str(e)}")
-        return await interaction.send("Couldn't download video.", ephemeral=True)
-    
-    produce_embed(file_path)
+        print(f"Error downloading video: {str(e)}")
+        return await interaction.followup.send("Couldn't download video.", ephemeral=True)
 
 # analyze file and output data
-async def produce_embed(file_path):
+async def produce_embed(file_path, interaction):
     try:
         returned_data = await check_video(file_path)
         
-        embed=nextcord.Embed(title=f"{attached_file.filename}", color=0x00ff00)
+        embed=nextcord.Embed(title=returned_data["file_name"], color=0x00ff00)
         embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
         embed.add_field(name="Type", value=returned_data["file_type"], inline=False)
         embed.add_field(name="Resolution", value=returned_data["file_resolution"], inline=False)
         embed.add_field(name="Frame Count", value=returned_data["file_framecount"], inline=False)
         embed.add_field(name="Frame Rate", value=returned_data["file_framerate"], inline=False)
         embed.add_field(name="Codec", value=returned_data["file_codec"], inline=False)
-        embed.set_image(url=attached_file.url)
         embed.set_footer(text=interaction.user.name, icon_url=interaction.user.avatar.url)
-        await interaction.send(embed=embed, ephemeral=False)
+        await interaction.followup.send(embed=embed, ephemeral=False)
+
+        os.remove(file_path)
     
     except Exception as e:
-        print(f"Couldn't analyze video: {str(e)}")
-        return await interaction.send("Couldn't analyze video.", ephemeral=True)
+        print(f"Error producing embed: {str(e)}")
+        os.remove(file_path)
+        return await interaction.followup.send("Couldn't analyze video.", ephemeral=True)
 
 bot.run(os.getenv("TOKEN"))

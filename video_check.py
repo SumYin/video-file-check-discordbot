@@ -19,10 +19,10 @@ async def download_attachment(attached_file):
     return file_path
 
 # link download
-async def download_link(linked_file):
+async def download_link(linked_file, id):
     try:
-        response = requests.get(url)
-        file_name = f"{id}_{os.path.basename(url).split('?')[0]}"
+        response = requests.get(linked_file)
+        file_name = f"{id}_{os.path.basename(linked_file).split('?')[0]}"
         file_path = os.path.join("./videos", file_name)
 
         with open(file_path, "wb") as file:
@@ -58,6 +58,10 @@ async def check_video(file_path):
     
     # path (string)
     videoProperties["file_path"] = file_path
+
+    # name (string)
+    name = file_path.split("/")[-1]
+    videoProperties["file_name"] = name
 
     # data (string)
     rawData = ffprobe(file_path).json
