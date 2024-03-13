@@ -29,7 +29,7 @@ async def download_link(linked_file, id):
             file.write(response.content)
         return file_path
 
-    except Exception as e:
+    except Exception as e: # can occur due to any network issues
         print(f"Error downloading video: {str(e)}")
         return f"Error downloading video: {str(e)}"
 
@@ -59,10 +59,6 @@ async def check_video(file_path):
     # path (string)
     videoProperties["file_path"] = file_path
 
-    # name (string)
-    name = file_path.split("/")[-1].split("_", 1)[1]
-    videoProperties["file_name"] = name
-
     # data (string)
     rawData = ffprobe(file_path).json
     videoProperties["raw"] = rawData
@@ -85,7 +81,6 @@ async def check_video(file_path):
         videoProperties["file_framecount"] = frameCount
 
         # frame rate (float)
-        #fps = round(float(stream.get("r_frame_rate", 0).split("/")[0]) / float(stream.get("r_frame_rate", 0).split("/")[1]), 2)
         fps = round(float(stream.get("avg_frame_rate", 0).split("/")[0]) / float(stream.get("avg_frame_rate", 0).split("/")[1]), 2)
         videoProperties["file_framerate"] = fps
 
@@ -93,7 +88,7 @@ async def check_video(file_path):
         codec = str(stream.get("codec_name", "unknown"))
         videoProperties["file_codec"] = codec
         
-    except Exception as e:
+    except Exception as e: #can occur for a large variety of reasons related to ffprobe's inability to parse all files, especially corrupt ones
         videoProperties["error"] = "Couldn't analyze video."
         print(f"Couldn't analyze video: {str(e)} ")
 

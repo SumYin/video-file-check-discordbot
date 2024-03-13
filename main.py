@@ -28,33 +28,23 @@ async def info(interaction: nextcord.Interaction):
 # attachment command
 @bot.slash_command(description="check attached file data")
 async def check_file(interaction: nextcord.Interaction, attached_file:nextcord.Attachment):
-    try:
-        await interaction.response.defer(ephemeral=True)
-        file_path=await download_attachment(attached_file)
-        await produce_embed(file_path, interaction)
-    
-    except Exception as e:
-        print(f"Error downloading video: {str(e)}")
-        return await interaction.followup.send("Couldn't download video.", ephemeral=True)
+    await interaction.response.defer(ephemeral=True)
+    file_path=await download_attachment(attached_file)
+    await produce_embed(file_path, interaction, attached_file.filename)
     
 # link commmand
 @bot.slash_command(description="check link file data")
 async def check_link(interaction: nextcord.Interaction, file_link: str):
-    try:
-        await interaction.response.defer(ephemeral=True)
-        file_path=await download_link(file_link, interaction.user.id)
-        await produce_embed(file_path, interaction)
-
-    except Exception as e:
-        print(f"Error downloading video: {str(e)}")
-        return await interaction.followup.send("Couldn't download video.", ephemeral=True)
+    await interaction.response.defer(ephemeral=True)
+    file_path=await download_link(file_link, interaction.user.id)
+    await produce_embed(file_path, interaction, file_link.split("/")[-1])
 
 # analyze file and output data
-async def produce_embed(file_path, interaction):
+async def produce_embed(file_path, interaction, file_name):
     try:
         returned_data = await check_video(file_path)
         
-        embed=nextcord.Embed(title=returned_data["file_name"], color=0x00ff00)
+        embed=nextcord.Embed(title=file_name, color=0x00ff00)
         embed.add_field(name="Size (MB)", value=returned_data["file_size"], inline=False)
         embed.add_field(name="Type", value=returned_data["file_type"], inline=False)
         embed.add_field(name="Resolution", value=returned_data["file_resolution"], inline=False)
@@ -66,7 +56,7 @@ async def produce_embed(file_path, interaction):
 
         os.remove(file_path)
     
-    except Exception as e:
+    except Exception as e: # can potentially happen if missing one of the fields above
         print(f"Error producing embed: {str(e)}")
         os.remove(file_path)
         return await interaction.followup.send("Couldn't analyze video.", ephemeral=True)
