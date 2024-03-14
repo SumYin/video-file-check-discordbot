@@ -1,4 +1,4 @@
 nextcord
 function-cooldowns
 aiohttp
-dotenv
+python-dotenv
