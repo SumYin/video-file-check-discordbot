@@ -4,34 +4,76 @@ from typing import NamedTuple
 import json
 import aiohttp
 import requests
+import time
+
+# get host data
+f = open('host.json')
+host = json.load(f)
+max_size = host.get("max_upload_size", 100)
+max_time = host.get("max_upload_time", 60)
 
 # attachment download
 async def download_attachment(attached_file):
+    error = ""
+
     async with aiohttp.ClientSession() as session:
         async with session.get(attached_file.url) as response:
             file_path = os.path.join("./videos", f"{attached_file.id}_{os.path.basename(attached_file.filename).split('?')[0]}")
+
+            size = 0
+            start = time.time()
+
             with open(file_path, "wb") as file:
                 while True:
                     chunk = await response.content.read(1024)
+
+                    # timeout
+                    if time.time() - start > max_time:
+                        error = "Download took too long."
+                        break
+
+                    # size limit
+                    size += len(chunk)
+                    if size > max_size:
+                        error = "File is too large."
+                        break
+
                     if not chunk:
                         break
                     file.write(chunk)
+    
+    # raise error outside of file write so that it's not used by system
+    if error != "":
+        os.remove(file_path)
+        raise ValueError(error)
+
     return file_path
 
 # link download
 async def download_link(linked_file, id):
-    try:
-        response = requests.get(linked_file)
-        file_name = f"{id}_{os.path.basename(linked_file).split('?')[0]}"
-        file_path = os.path.join("./videos", file_name)
+    r = requests.get(linked_file, stream=True)
 
-        with open(file_path, "wb") as file:
-            file.write(response.content)
-        return file_path
+    file_name = f"{id}_{os.path.basename(linked_file).split('?')[0]}"
+    file_path = os.path.join("./videos", file_name)
 
-    except Exception as e: # can occur due to network or server connectivity issues
-        print(f"Error downloading video: {str(e)}")
-        return f"Error downloading video: {str(e)}"
+    size = 0
+    start = time.time()
+
+    for chunk in r.iter_content(1024):
+        # timeout
+        if time.time() - start > max_time:
+            raise ValueError("Download took too long.")
+            return
+        
+        # size limit
+        size += len(chunk)
+        if size > max_size:
+            raise ValueError("File is too large.")
+            return
+
+    with open(file_path, "wb") as file:
+        file.write(r.content)
+    return file_path
 
 # data class for ffprobe output
 class FFProbeResult(NamedTuple):
@@ -69,29 +111,24 @@ async def check_video(file_path):
     # type
     videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
 
-    try:
-        data = json.loads(rawData)
-        stream = data.get("streams")[0]
+    data = json.loads(rawData)
+    stream = data.get("streams")[0]
 
-        # resolution
-        videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + "x" + str(stream.get("height", "unknown height"))
+    # resolution
+    videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + "x" + str(stream.get("height", "unknown height"))
 
-        # frame count
-        frameCount = str(stream.get("nb_read_frames", "unknown"))
-        videoProperties["file_framecount"] = frameCount
+    # frame count
+    frameCount = str(stream.get("nb_read_frames", "unknown"))
+    videoProperties["file_framecount"] = frameCount
 
-        # frame rate
-        fps = round(float(stream.get("avg_frame_rate", 0).split("/")[0]) / float(stream.get("avg_frame_rate", 0).split("/")[1]), 2)
-        if fps == 0:
-            fps = "unknown"
-        videoProperties["file_framerate"] = fps
+    # frame rate
+    fps = round(float(stream.get("avg_frame_rate", 0).split("/")[0]) / float(stream.get("avg_frame_rate", 0).split("/")[1]), 2)
+    if fps == 0:
+        fps = "unknown"
+    videoProperties["file_framerate"] = fps
 
-        # codec
-        codec = str(stream.get("codec_name", "unknown"))
-        videoProperties["file_codec"] = codec
-        
-    except Exception as e: #can occur for a large variety of reasons related to ffprobe's inability to parse all files, especially corrupt ones
-        videoProperties["error"] = "Couldn't analyze video."
-        print(f"Couldn't analyze video: {str(e)} ")
+    # codec
+    codec = str(stream.get("codec_name", "unknown"))
+    videoProperties["file_codec"] = codec
 
     return videoProperties

@@ -1,10 +1,12 @@
 {
+    "rules_title": ":scroll: __Rules__ | __read carefully__ :scroll:",
     "rules": [
         "Replace the character with your own.",
         "Don't touch the camera.",
         "Maintain the visual weight of the steps."
     ],
 
+    "faq_title": ":grey_question: __Frequently Asked Questions__ :grey_question:",
     "faq": [
         {
             "Q": "When is the submission?",
@@ -25,19 +27,24 @@
         "codec": ["h264", "h265"]
     },
 
+    "cooldown_times":{
+        "short": {
+            "tokens": 2,
+            "period": 5
+        },
+        "long": {
+            "tokens": 2,
+            "period": 20
+        }
+    },
+
     "cooldown_bypass_users": [
         "187049690196475904", 
         "686253025970356309"
     ],
 
-    "cooldown_times":{
-        "short": {
-            "tokens": 1,
-            "period": 5
-        },
-        "long": {
-            "tokens": 3,
-            "period": 20
-        }
+    "limits": {
+        "max_upload_size": 5,
+        "max_upload_wait": 60
     }
 }
