@@ -25,9 +25,9 @@ Additionally, in the context of a contest, hosts can specify their own 'rules' a
 
 `/check_link [url]`: send a file through a link, have it analyzed, and recieve an output of the file's properties along with their validation. The file is not subject to Discord's file size limitations.
 
-`/rules`: request the host-defined rules.
+`/rules [optional: language]`: request the host-defined rules. With optional language parameter, request the host-defined rules in a specific language. Left empty will return the default language.
 
-`/faq`: request the host-defined FAQs.
+`/faq [optional: language]`: request the host-defined FAQs. With optional language parameter, request the host-defined FAQs in a specific language. Left empty will return the default language.
 
 `/ping`: test ping.
 
@@ -45,22 +45,38 @@ Additionally, in the context of a contest, hosts can specify their own 'rules' a
 
 This file contains properties defined by the host. These are:
 
-#### rules_title
-
-Title of rules section.
-
 #### rules
 
-Array of strings, each defining a rule of a contest or competition.
+dictionary containing information on the rules in diffrent languages.
 
-#### faq_title
+> #### language_key/name
+> 
+> The name of the option that will show in the command
+> 
+>> #### title
+>> 
+>> Title of rules section.
+>> 
+>>#### rules
+>>
+>>Array of strings, each defining a rule of a contest or competition.
+> ---
+### faq
 
-Title of FAQ section.
-
-#### faq
-
-Array of objects, each containting 2 strings: a question, and an answer.
-Useful for more FAQ formatted rules.
+dictionary containing information on the faq in diffrent languages.
+> #### language_key/name
+> 
+> The name of the option that will show in the command
+> 
+>>#### title
+>> 
+>> Title of FAQ section.
+>> 
+>> #### faq
+>> 
+>> Array of objects, each containting 2 strings: a question, and an answer.
+>> Useful for more FAQ formatted rules.
+> ---
 
 #### targets
 
