@@ -9,8 +9,8 @@ import time
 # get host data
 f = open('host.json')
 host = json.load(f)
-max_size = host.get("max_upload_size", 100)
-max_time = host.get("max_upload_time", 60)
+max_size = host.get("limits").get("max_upload_size", 100) * 1024 * 1024 # to megabytes
+max_time = host.get("limits").get("max_upload_time", 60)
 
 # attachment download
 async def download_attachment(attached_file):
@@ -106,7 +106,7 @@ async def check_video(file_path):
     videoProperties["raw"] = rawData
 
     # size
-    videoProperties["file_size"] = round(os.stat(file_path).st_size / (1024 * 1024), 2)
+    videoProperties["file_size"] = float(round(os.stat(file_path).st_size / (1024 * 1024), 2))
 
     # type
     videoProperties["file_type"] = str(os.path.splitext(file_path)[1])
@@ -118,7 +118,7 @@ async def check_video(file_path):
     videoProperties["file_resolution"] = str((stream.get("width", "unknown width"))) + "x" + str(stream.get("height", "unknown height"))
 
     # frame count
-    frameCount = str(stream.get("nb_read_frames", "unknown"))
+    frameCount = float(stream.get("nb_read_frames", "unknown"))
     videoProperties["file_framecount"] = frameCount
 
     # frame rate

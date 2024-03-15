@@ -38,13 +38,8 @@
         }
     },
 
-    "cooldown_bypass_users": [
-        "187049690196475904", 
-        "686253025970356309"
-    ],
-
     "limits": {
-        "max_upload_size": 5,
+        "max_upload_size": 100,
         "max_upload_wait": 60
     }
 }

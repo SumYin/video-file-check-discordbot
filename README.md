@@ -81,10 +81,6 @@ After a period of 20 seconds, the rate-limiting resets.
 
 The `short` cooldown property set is used for cheap commands, while the `long` cooldown property set is used for commands that download and analyze files.
 
-#### cooldown_bypass_users
-
-Array of user IDs who can bypass the cooldown times, useful for debugging.
-
 #### limits
 
 Object which contains limit values for file uploads:

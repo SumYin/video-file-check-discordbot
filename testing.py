@@ -21,7 +21,8 @@ async def browse_file():
 # check all files in sample folder
 async def batch_check():
     for file_path in file_paths:
-        data = await check_video(file_path)
+        try: data = await check_video(file_path)
+        except Exception as e: print(f"Error! {e}")
         print_data(data)
 
 def print_data(data):
