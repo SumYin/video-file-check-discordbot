@@ -7,7 +7,7 @@ import requests
 import time
 
 # get host data
-f = open('host.json')
+f = open('host.json', 'r', encoding='utf-8')
 host = json.load(f)
 max_size = host.get("limits").get("max_upload_size", 100) * 1024 * 1024 # to megabytes
 max_time = host.get("limits").get("max_upload_time", 60)

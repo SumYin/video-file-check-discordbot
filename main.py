@@ -1,7 +1,7 @@
 import os
 
 import nextcord
-from nextcord import Interaction
+from nextcord import Interaction, SlashOption
 from nextcord.ext import commands
 
 import cooldowns
@@ -16,7 +16,7 @@ from video_check import *
 load_dotenv()
 
 # get host data
-f = open('host.json')
+f = open('host.json', 'r', encoding='utf-8')
 host = json.load(f)
 cooldown_short_tokens = host.get("cooldown_times").get("short").get("tokens", 1)
 cooldown_short_period = host.get("cooldown_times").get("short").get("period", 5)
@@ -58,18 +58,28 @@ async def info(interaction: nextcord.Interaction):
 # rules command
 @bot.slash_command(description="check rules")
 @cooldowns.cooldown(cooldown_short_tokens, cooldown_short_period, bucket=cooldowns.SlashBucket.author)
-async def rules(interaction: nextcord.Interaction):
-    embed = nextcord.Embed(title=host.get("rules_title"), color=0x000000, description="")
-    for rule in host.get("rules"):
+async def rules(interaction: nextcord.Interaction, language: str = SlashOption(required=False, name="language",choices=host.get("rules").keys(),description="language of the rules")):
+    if language==None:
+        r = host.get("rules").get(next(iter(host.get("rules"))))
+    else:
+        r = host.get("rules").get(language)
+
+    embed = nextcord.Embed(title=r.get("title"), color=0x000000, description="")
+    for rule in r.get("rules"):
         embed.description += rule + "\n"
     await interaction.send(embed=embed, ephemeral=True)
 
 # faq command
 @bot.slash_command(description="check frequently asked questions")
 @cooldowns.cooldown(cooldown_short_tokens, cooldown_short_period, bucket=cooldowns.SlashBucket.author)
-async def faq(interaction: nextcord.Interaction):
+async def faq(interaction: nextcord.Interaction, language: str = SlashOption(required=False, name="language",choices=host.get("rules").keys(),description="language of the rules")):
+    if language==None:
+        r = host.get("faq").get(next(iter(host.get("faq"))))
+    else:
+        r = host.get("faq").get(language)
+    
     embed = nextcord.Embed(title=host.get("faq_title"), color=0x00000)
-    for faq in host.get("faq"):
+    for faq in r.get("faq"):
         embed.add_field(name=faq.get("Q"), value=faq.get("A"), inline=False)
     await interaction.send(embed=embed, ephemeral=True)
 

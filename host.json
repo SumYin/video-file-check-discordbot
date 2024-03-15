@@ -1,22 +1,51 @@
 {
-    "rules_title": ":scroll: __Rules__ | __read carefully__ :scroll:",
-    "rules": [
-        "Replace the character with your own.",
-        "Don't touch the camera.",
-        "Maintain the visual weight of the steps."
-    ],
-
-    "faq_title": ":grey_question: __Frequently Asked Questions__ :grey_question:",
-    "faq": [
-        {
-            "Q": "When is the submission?",
-            "A": "March 3, 11:59pm, PST."
+    "rules":{
+        "English":{
+            "title": ":scroll: __Rules__ | __read carefully__ :scroll:",
+            "rules": [
+                "Replace the character with your own.",
+                "Don't touch the camera.",
+                "Maintain the visual weight of the steps."
+            ]
         },
-        {
-            "Q": "Can I touch the camera?",
-            "A": "No."
+        "Chinese":{
+            "title": ":scroll: __规则__ | __仔细阅读__ :scroll:",
+            "rules": [
+                "用你自己的角色替换原角色。",
+                "不要触摸摄像机。",
+                "保持步骤的视觉重量。"
+            ]
         }
-    ],
+    },
+
+    "faq":{
+        "English":{
+            "title": ":grey_question: __Frequently Asked Questions__ :grey_question:",
+            "faq": [
+                {
+                    "Q": "When is the submission?",
+                    "A": "March 3, 11:59pm, PST."
+                },
+                {
+                    "Q": "Can I touch the camera?",
+                    "A": "No."
+                }
+            ]
+        },
+        "Chinese":{
+            "title": ":grey_question: __常见问题__ :grey_question:",
+            "faq": [
+                {
+                    "Q": "提交时间是什么时候？",
+                    "A": "3月3日, 晚上11:59, PST。"
+                },
+                {
+                    "Q": "我可以触摸摄像机吗？",
+                    "A": "不可以。"
+                }
+            ]
+        }
+    },
 
     "targets": {
         "size": [100],
