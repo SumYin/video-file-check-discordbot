@@ -70,5 +70,7 @@
     "limits": {
         "max_upload_size": 100,
         "max_upload_wait": 60
-    }
+    },
+
+    "embed_color": "0x6eff90"
 }

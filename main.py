@@ -22,6 +22,7 @@ cooldown_short_tokens = host.get("cooldown_times").get("short").get("tokens", 1)
 cooldown_short_period = host.get("cooldown_times").get("short").get("period", 5)
 cooldown_long_tokens = host.get("cooldown_times").get("long").get("tokens", 1)
 cooldown_long_period = host.get("cooldown_times").get("long").get("period", 20)
+embed_color = int(host.get("embed_color"), 16)
 
 # discord bot
 intents = nextcord.Intents.default()
@@ -54,7 +55,7 @@ async def ping(interaction: nextcord.Interaction):
 @bot.slash_command(description="get information about this bot")
 @cooldowns.cooldown(cooldown_short_tokens, cooldown_short_period, bucket=cooldowns.SlashBucket.author)
 async def info(interaction: nextcord.Interaction):
-    await interaction.send("Bot Source Code: https://github.com/SumYin/video-file-check-discordbot", ephemeral=True)
+    await interaction.send("Bot Source Code: [Github Repo](https://github.com/SumYin/video-file-check-discordbot)", ephemeral=True)
 
 # rules command
 @bot.slash_command(description="check rules")
@@ -65,7 +66,7 @@ async def rules(interaction: nextcord.Interaction, language: str = SlashOption(r
     else:
         r = host.get("rules").get(language)
 
-    embed = nextcord.Embed(title=r.get("title"), color=0x000000, description="")
+    embed = nextcord.Embed(title=r.get("title"), color=embed_color, description="")
     for rule in r.get("rules"):
         embed.description += rule + "\n"
     await interaction.send(embed=embed, ephemeral=True)
@@ -79,7 +80,7 @@ async def faq(interaction: nextcord.Interaction, language: str = SlashOption(req
     else:
         r = host.get("faq").get(language)
     
-    embed = nextcord.Embed(title=host.get("faq_title"), color=0x00000)
+    embed = nextcord.Embed(title=host.get("faq_title"), color=embed_color)
     for faq in r.get("faq"):
         embed.add_field(name=faq.get("Q"), value=faq.get("A"), inline=False)
     await interaction.send(embed=embed, ephemeral=True)
@@ -111,7 +112,7 @@ async def produce_embed(file_path, interaction, file_name):
     try:
         video_data = await check_video(file_path)
         
-        embed = nextcord.Embed(title=file_name, color=0x000000, timestamp=datetime.now())
+        embed = nextcord.Embed(title=file_name, color=embed_color, timestamp=datetime.now())
 
         valid = " :white_check_mark:"
         invalid = " :x:"
