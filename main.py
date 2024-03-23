@@ -30,6 +30,7 @@ bot = commands.Bot(intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}.')
+    await bot.change_presence(activity=nextcord.CustomActivity(name="Not official, Community made"))
 
 @bot.event
 async def on_application_command_error(interaction: nextcord.Interaction, error: Exception):
